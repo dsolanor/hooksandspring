@@ -1,17 +1,19 @@
-import React, { useState, useCallback } from "react";
-import "./App.css";
-import { UserList } from "./components/usersList";
-import { UserDetails } from "./components/userDetails";
-import { useTransition, animated } from "react-spring";
-import useUsers from "./hooks/useUsers";
-import useUser from "./hooks/useUser";
+import React, { useState, useCallback } from 'react';
+import './App.css';
+import { UserList } from './components/usersList';
+import { UserDetails } from './components/userDetails';
+import { useTransition, animated } from 'react-spring';
+import useUsers from './hooks/useUsers';
+import useUser from './hooks/useUser';
 
 export default function App() {
-    const [users, fetchUser] = useUsers();
+    const [users] = useUsers();
     const [user, setUser] = useUser();
     const [index, set] = useState(0);
+    const [init, setInit] = useState(false);
     const goPage = useCallback(() => set(state => (state + 1) % 2), []);
     const goUser = e => {
+        setInit(true);
         const index = Number(e.currentTarget.id);
         setUser(users[index]);
         goPage();
@@ -29,7 +31,7 @@ export default function App() {
         ({ style }) => (
             <animated.div
                 className="simple-trans-main bg-purple-lighter"
-                style={{ ...style, padding: "20px" }}
+                style={{ ...style, padding: '20px' }}
             >
                 <UserDetails user={user} action={goPage} />
             </animated.div>
@@ -38,16 +40,18 @@ export default function App() {
 
     const transitions = useTransition(index, p => p, {
         from: {
-            opacity: 1,
-            transform: `translate3d(${index ? "100%" : "-100%"},0,0)`
+            opacity: init ? 1 : 0,
+            transform: `translate3d(${
+                index ? '100%' : init ? '-100%' : '0%'
+            },0,0)`
         },
         enter: {
             opacity: 1,
-            transform: "translate3d(0%,0,0)"
+            transform: 'translate3d(0%,0,0)'
         },
         leave: {
             opacity: 0,
-            transform: `translate3d(${index ? "-100%" : "100%"},0,0)`
+            transform: `translate3d(${index ? '-100%' : '100%'},0,0)`
         }
     });
 
